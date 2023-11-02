@@ -32,10 +32,85 @@ Las primeras 32 senales no se encolan, ejemplo:
 
 ### Envio de signal a un proceso
 
+#### Por terminal
 En la terminal se utiliza el siguiente comando, donde
 - sn: Es el numero del signal
 - pid: Es el ID del proceso al que se le envia la signal
 
 ```
-kill -sn pid
+kill -<sn> <pid>
 ```
+
+El comando Kill no solo es utilizado para matar un proceso, como se puede pensar.
+
+### Usando la Syscall KILL
+
+En el caso de que se use por codigo, se usa el siguiente prototipo.
+
+```
+int kill(pid t pid, int sig);
+```
+
+### Signals mas usadas
+
+![ Signals comunes](./figures/signals_comunes.png)
+
+Ejemplo, en linux cuando un proceso esta colgado, escribimos el comando: kill -9, y el sistema operativo termina este proceso. Es una operacion forzada.
+
+En el caso del SIGTERM, es una manera menos estricta de forzar el cierre de un proceso, se puede especificar que hacer antes de terminarlo, por ejemplo, cerrar un archivo, escribir un log, guardar un log, esto es definido por el usuario, con el objetivo de que no se corrompa el proceso, cerrandolo bruscamente.
+
+Por lo tanto, se recomienda cerrar los procesos con SIGTERM. 
+Por default, si enviamos solo el comando Kill, se envia el signal SIGTERM. 
+
+Cuando se preciona Ctrl+C se envia un signal SIGINT, que por defecto tambien cierra un proceso. Pero se puede modificar el Handler para que haga algo mas o otra cosa.
+
+Con Ctrl+Z se envia SIGTSTP, se permite detener un proceso y con SIGCONT se puede reanudar el proceso.
+
+SIGCHILD se usa para enviar que termino el proceso un proceso hijo a su proceso padre. Es aqui cuando el proceso padre envia un wait para terminarlo y no dejarlo en estado zombie.
+
+### Practica 1
+
+1) Crear el archivo loop.py que permita imprimir por consola "Tick" cada 1 segundo usando python.
+
+```
+import time
+while True:
+	print("Tick")
+	time.sleep(1)
+```
+2) Ejecutar la lista de procesos activos para ver el estado del mismo y obtener el pid, filtrar el proceso loop.py.
+
+> ps -elf | grep loop.py
+
+![ Proceso loop.py ](./figures/proceso_loop.png)
+
+Se observa que el estado del proceso es "S" que indica que no se puede interrumpir, pero se lo puede sacar de ese estado enviandole un signal. 
+
+![ Estado de procesos ](./figures/estadoprocesos.png)
+
+**Porque no esta en running el proceso si el programa se esta ejecutando?** 
+
+Esto sucede por que la mayoria del tiempo se encuentra colgado en el:
+> time.sleep(1)
+
+El 99% del tiempo esta en el Sleep y el 1% imprimiendo por consola.
+
+3) Detener el proceso ejecutando Ctrl+Z (Signal SIGSTP):
+
+![ Estado de procesos ](./figures/signal_detener.png)
+
+Al presionar Control+Z se envia el signal al proceso y notamos que ahora el estado del proceso es "T" que significa DETENIDO.
+
+![Proceso detenido ](./figures/proceso_detenido.png)
+
+4) Sacarlo del estado detenido a running enviando la signal SIGCONT.
+
+> kill -SIGCONT 2272
+
+El 2272 es el PID de loop.py.
+
+A continuacion, vemos que se reanudo el proceso y ahora paso al estado "S" nuevamente.
+
+![Proceso reanudado](./figures/Reanudar_proceso.png)
+
+
