@@ -79,8 +79,9 @@ while True:
 	time.sleep(1)
 ```
 2) Ejecutar la lista de procesos activos para ver el estado del mismo y obtener el pid, filtrar el proceso loop.py.
-
-> ps -elf | grep loop.py
+```
+ps -elf | grep loop.py
+```
 
 ![ Proceso loop.py ](./figures/proceso_loop.png)
 
@@ -91,7 +92,9 @@ Se observa que el estado del proceso es "S" que indica que no se puede interrump
 **Porque no esta en running el proceso si el programa se esta ejecutando?** 
 
 Esto sucede por que la mayoria del tiempo se encuentra colgado en el:
-> time.sleep(1)
+```
+time.sleep(1)
+```
 
 El 99% del tiempo esta en el Sleep y el 1% imprimiendo por consola.
 
@@ -104,8 +107,9 @@ Al presionar Control+Z se envia el signal al proceso y notamos que ahora el esta
 ![Proceso detenido ](./figures/proceso_detenido.png)
 
 4) Sacarlo del estado detenido a running enviando la signal SIGCONT.
-
-> kill -SIGCONT 2272
+```
+kill -SIGCONT 2272
+```
 
 El 2272 es el PID de loop.py.
 
