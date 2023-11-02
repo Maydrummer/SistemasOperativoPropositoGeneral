@@ -68,7 +68,7 @@ Con Ctrl+Z se envia SIGTSTP, se permite detener un proceso y con SIGCONT se pued
 
 SIGCHILD se usa para enviar que termino el proceso un proceso hijo a su proceso padre. Es aqui cuando el proceso padre envia un wait para terminarlo y no dejarlo en estado zombie.
 
-### Practica 1
+### Practica 1: Envio de SIGNALS
 
 1) Crear el archivo loop.py que permita imprimir por consola "Tick" cada 1 segundo usando python.
 
@@ -117,4 +117,34 @@ A continuacion, vemos que se reanudo el proceso y ahora paso al estado "S" nueva
 
 ![Proceso reanudado](./figures/Reanudar_proceso.png)
 
+
+**Que pasa si se detiene con Ctrl+Z el proceso y se lo vuelve a ejecutar con python?**
+
+Se crea otro proceso que ejecuta el mismo programa, notamos diferentes process ID.
+
+![Proceso repetido](./figures/mismo_proceso_repetido.png)
+
+5) Use comandos: jobs, bg y fg.
+
+El comando **jobs** permite enlistar los procesos en el background.
+
+Si queremos enviar el comando:
+```
+kill -SIGCONT <pid>
+```
+Podemos utilizar el comando analogo, donde **num** es el numero que se muestra en la imagen, no esta relacionado con el process ID.
+```
+bg <num>
+```
+A continuacion vemos el ejemplo:
+
+![jobs y bg](./figures/jobs_bg.png)
+
+El comando bg reanuda el proceso y desconecta la entrada del terminal del proceso, es decir, se puede ejecutar cualquier comando de linux normalmente, estos no iran al proceso. En la foto se ve que al mismo tiempo ejecutamos en el background el comando **DATE**.
+
+Ahora usando el comando **fg** la stin (estandar input) se va a reconectar, es decir, lo que se escriba va a parar dentro del proceso, ya no se interpretaran los comandos.
+
+![Jobs y fg](./figures/fg_comando.png)
+
+**Observacion:** Cabe recalcar que **fg** y **bg** envian el signal SIGCONT.
 
