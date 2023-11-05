@@ -140,9 +140,9 @@ A continuacion vemos el ejemplo:
 
 ![jobs y bg](./figures/jobs_bg.png)
 
-El comando bg reanuda el proceso y desconecta la entrada del terminal del proceso, es decir, se puede ejecutar cualquier comando de linux normalmente, estos no iran al proceso. En la foto se ve que al mismo tiempo ejecutamos en el background el comando **DATE**.
+El comando bg reanuda el proceso y desconecta la entrada del terminal del proceso, es decir, el estandar input queda conectado al interprete bash linux. En la foto anterior se ve que al escribir **DATE**, el interprete de bash te devuelve una respuesta, es decir, el proceso queda en el background.
 
-Ahora usando el comando **fg** la stin (estandar input) se va a reconectar, es decir, lo que se escriba va a parar dentro del proceso, ya no se interpretaran los comandos.
+Ahora usando el comando **fg** la stin (estandar input) se va a reconectar al proceso, es decir, lo que se escriba va a parar dentro del proceso, ya no se interpretaran los comandos. Es como si el proceso queda en primer plano.
 
 ![Jobs y fg](./figures/fg_comando.png)
 
