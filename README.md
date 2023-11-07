@@ -148,3 +148,74 @@ Ahora usando el comando **fg** la stin (estandar input) se va a reconectar al pr
 
 **Observacion:** Cabe recalcar que **fg** y **bg** envian el signal SIGCONT.
 
+### Practica 2: Configurar para que un proceso escuche una signals usando C.
+
+1. Crear un programa que al recibir el signal SIGINT (Ctrl+C), imprima un mensaje y acabe el proceso. Este programa normalmente debe recibir por la terminal un string, que si se ingreso hara un eco de este.
+
+**Funciones utilizadas:**
+- **fgets:** fgets() lee una línea de la secuencia especificada y la almacena en la cadena a la que apunta str. Se detiene cuando se leen (n-1) caracteres, se lee el carácter de nueva línea(cuando se presiona enter) o se llega al final del archivo, lo que ocurra primero
+	- Sintaxis: 
+	```
+	char * fgets (char * str , int n , ARCHIVO * flujo );
+	```
+	- Parametros: 
+		- str: puntero a una arreglo de caracteres donde se copia la cadena leída.
+		- n: número máximo de caracteres que se copiarán en str (incluido el carácter nulo final).
+		- *flujo: puntero a un objeto ARCHIVO que identifica un flujo de entrada. Se puede obtener lectura desde el **stdin** que es la terminal.
+		- return: retorna un puntero al string donde la entrada es almacenada. Si da NULL, hay un error. 
+
+- **write:** Se utiliza para escribir datos desde un descriptor de archivo (como un archivo o un descriptor de archivo de socket) a un destino específico. 
+	- Sintaxis:
+	```
+	ssize_t write(int file_descriptor, const void *buffer, size_t count);
+	```
+	- Parametros:
+		- file_descriptor: Este es el descriptor de archivo en el que deseas escribir los datos. Puede ser un archivo, un socket, o cualquier otro tipo de descriptor de archivo. Debes abrir el descriptor de archivo previamente usando la función open o algún otro método adecuado. Al utilizar el 1 en este argumento, estamos especificando que usaremos el descriptor de archivo estándar de salida (STDOUT). En otras palabras, esta llamada escribirá la cadena en la salida estándar, que normalmente es la pantalla.
+		- buffer: Un puntero a los datos que deseas escribir en el descriptor de archivo. Estos datos se almacenan en una zona de memoria previamente asignada. El tipo de datos es const void *, lo que significa que se puede utilizar para escribir cualquier tipo de datos.
+		- count: La cantidad de bytes que deseas escribir desde el búfer al descriptor de archivo. Especifica el número de bytes que deseas escribir.
+		- Valor de retorno: La función write devuelve el número de bytes escritos con éxito si tiene éxito, o -1 en caso de error. Puedes usar el valor de retorno para verificar cuántos bytes se han escrito con éxito en el descriptor de archivo.
+
+- **sigaction:** La función sigaction en C se utiliza para establecer y modificar el manejo de señales (signals) en un programa. Las señales son eventos asincrónicos que pueden ser generados por el sistema operativo o por otros procesos, y son utilizadas para notificar eventos como interrupciones, errores y eventos específicos del sistema.
+	- Sintaxis: 
+	```
+	#include <signal.h>
+
+	int sigaction(int signum, const struct sigaction *act, struct sigaction *oldact);
+	```
+	- Parametros:
+		- signum: Este es el número de la señal que se va a manejar o configurar. Por ejemplo, SIGINT representa la señal de interrupción (como la generada por la combinación de teclas Ctrl+C) y su valor numérico es 2.
+		- act: Un puntero a una estructura struct sigaction que contiene la nueva configuración y el manejador de la señal. Puedes especificar cómo deseas que se maneje la señal con esta estructura. Por ejemplo, puedes proporcionar una función que se llame cuando se reciba la señal.
+		- oldact: Un puntero a una estructura struct sigaction que almacena la configuración anterior de la señal. Si no estás interesado en la configuración anterior, puedes pasar NULL en lugar de un puntero a una estructura struct sigaction.
+		- Valor de retorno: La función sigaction devuelve 0 si se ejecuta con éxito y -1 si ocurre un error. Puedes usar el valor de retorno para verificar si la configuración de la señal se realizó correctamente.
+
+- **perror:** La función perror se utiliza comúnmente después de una llamada a una función que establece la variable errno para imprimir un mensaje de error descriptivo relacionado con la operación fallida.
+	- Sintaxis:
+	```
+	#include <stdio.h>
+
+	void perror(const char *s);
+	```
+	- Parametros:
+		- s: Un puntero a una cadena de caracteres que se utiliza como prefijo para el mensaje de error. Este prefijo se imprimirá antes del mensaje de error. Puedes pasar NULL si no deseas un prefijo.
+		- Valor de retorno: La función perror no devuelve ningún valor (tipo de retorno es void). Simplemente imprime el mensaje de error en la salida estándar de error (stderr).
+
+2. Probar el programa, compilamos e ingresamos por la stdin mensajes.
+
+![Ejecucion Practica Signals](./figures/ejecucion_practicaSignals.png)
+
+**Observacion:** Hasta este punto se testea el programa y vemos que funciona normalmente. 
+
+3. Enviar la signal SIGINT con control+C.
+
+![Envio SigInt](./figures/enviar_sigint.png)
+
+**Observacion:** Notamos que al presionar Ctrl+C, se llama a una interrupcion del sistema para terminar el proceso, pero antes se imprime o se ejecuta lo que esta dentro del Handler de esta interrupcion, que en este caso es un print de "Ahhh! SIGINT". Notamos tambien que la funcion **perror** entra y nos indica el tipo de error que hubo, que en este caso es "Interrupted systems call".
+
+4. Modifique el programa para que al recibir la SIGINT, no se acabe el proceso.
+```
+sa.sa_flags = SA_RESTART; //se debe cambiar el campo sa_flags de la estructura sa.
+```
+![Modificacion practica signals](./figures/practica_signals_v2.png)
+**Observacion:** Ahora el llamado de Ctrl+C no acaba el proceso, hemos modificado el comportamiento de esta SIGINT. El proceso acaba cuando se envia el string por la stdin.
+
+
